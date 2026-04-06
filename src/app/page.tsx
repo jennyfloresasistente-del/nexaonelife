@@ -6,7 +6,7 @@ import {
   X, Loader2, GitBranch, CreditCard, TriangleAlert, Globe,
   Settings, ArrowRight, Clock, FolderOpen, Maximize2, Minimize2,
   RefreshCw, Monitor, Smartphone, Tablet, ZoomIn, ZoomOut,
-  Wand2, Layers, Brain, Cpu, Paintbrush, CheckCircle2,
+  Wand2, Layers, Brain, Cpu, Paintbrush, CheckCircle2, LogIn, UserCircle,
 } from "lucide-react";
 import { useUserStore } from "@/lib/store";
 import { calcularCosto, NIVEL_COLORS } from "@/lib/creditos";
@@ -394,6 +394,21 @@ export default function NexaOnePage() {
             {creditos} créditos
             {creditos <= 2 && <TriangleAlert size={10} />}
           </button>
+
+          {/* Instalar PWA */}
+          <PWAInstall />
+
+          {/* Iniciar sesión */}
+          <a href="/login"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{
+              background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2))",
+              border: "1px solid rgba(124,58,237,0.35)",
+              color: "#a78bfa",
+            }}>
+            <LogIn size={11} />
+            <span className="hidden sm:inline">Iniciar sesión</span>
+          </a>
 
           <a href="/admin" className="p-2 rounded-lg transition-all"
             style={{ color: C.dim, background: C.surface, border: `1px solid ${C.border}` }}>
