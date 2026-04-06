@@ -1,9 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Nexa One Life — Crea apps con IA",
@@ -58,22 +54,16 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Nexa One Life" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="apple-touch-startup-image" href="/logo.png" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js');
+            });
+          }
+        ` }} />
       </head>
-      <body className={`${inter.className} min-h-full flex flex-col bg-gray-950 text-white antialiased`}>
+      <body className="min-h-full flex flex-col bg-gray-950 text-white antialiased" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
         {children}
-        <Script id="register-sw" strategy="afterInteractive">
-          {`
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(reg) {
-                  console.log('SW registrado:', reg.scope);
-                }).catch(function(err) {
-                  console.log('SW error:', err);
-                });
-              });
-            }
-          `}
-        </Script>
       </body>
     </html>
   );
