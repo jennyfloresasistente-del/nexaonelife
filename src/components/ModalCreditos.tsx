@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { X, Zap, Star, Check, Loader2, CreditCard, Sparkles } from "lucide-react";
+import { X, Zap, Star, Check, Loader2, CreditCard } from "lucide-react";
 import { PLANES } from "@/lib/store";
 
-interface Props {
-  onClose: () => void;
-}
+interface Props { onClose: () => void; }
+
+const GRAD = "linear-gradient(135deg, #7c3aed, #06b6d4)";
+const PURPLE = "#7c3aed";
+const PURPLE_DIM = "rgba(124,58,237,0.12)";
+const PURPLE_BORDER = "rgba(124,58,237,0.25)";
+const PURPLE_LIGHT = "#a78bfa";
 
 export function ModalCreditos({ onClose }: Props) {
   const [loading, setLoading] = useState<string | null>(null);
@@ -31,15 +35,22 @@ export function ModalCreditos({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-      <div className="w-full max-w-2xl rounded-2xl overflow-hidden" style={{ background: "#0a0a0a", border: "1px solid rgba(255,215,0,0.15)", boxShadow: "0 0 80px rgba(255,215,0,0.05)" }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.88)", backdropFilter: "blur(16px)" }}>
+      <div className="w-full max-w-2xl rounded-2xl overflow-hidden"
+        style={{ background: "#050508", border: `1px solid ${PURPLE_BORDER}`, boxShadow: `0 0 80px rgba(124,58,237,0.15)` }}>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b" style={{ borderColor: "rgba(255,215,0,0.1)" }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b"
+          style={{ borderColor: PURPLE_BORDER }}>
           <div>
-            <h2 className="text-xl font-black" style={{ background: "linear-gradient(90deg,#ffd700,#b8860b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <h2 className="text-xl font-black"
+              style={{ background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Comprar Créditos
             </h2>
-            <p className="text-sm mt-0.5" style={{ color: "#52525b" }}>Precios en pesos mexicanos (MXN) · Pago seguro con Mercado Pago</p>
+            <p className="text-sm mt-0.5" style={{ color: "#52525b" }}>
+              Precios en pesos mexicanos (MXN) · Pago seguro con Mercado Pago
+            </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl transition-all" style={{ color: "#52525b" }}>
             <X size={18} />
@@ -47,19 +58,19 @@ export function ModalCreditos({ onClose }: Props) {
         </div>
 
         {/* Planes */}
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {PLANES.map((plan) => (
             <div key={plan.id} className="relative rounded-2xl p-5 transition-all"
               style={{
-                background: plan.popular ? "rgba(255,215,0,0.04)" : "rgba(255,255,255,0.02)",
-                border: `1px solid ${plan.popular ? "rgba(255,215,0,0.25)" : "rgba(255,255,255,0.06)"}`,
-                boxShadow: plan.popular ? "0 0 40px rgba(255,215,0,0.05)" : "none",
+                background: plan.popular ? PURPLE_DIM : "rgba(255,255,255,0.02)",
+                border: `1px solid ${plan.popular ? PURPLE_BORDER : "rgba(255,255,255,0.06)"}`,
+                boxShadow: plan.popular ? `0 0 40px rgba(124,58,237,0.1)` : "none",
               }}>
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full"
-                    style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)", color: "#000", boxShadow: "0 4px 15px rgba(255,215,0,0.3)" }}>
-                    <Star size={10} fill="#000" /> MÁS POPULAR
+                    style={{ background: GRAD, color: "#fff", boxShadow: "0 4px 15px rgba(124,58,237,0.4)" }}>
+                    <Star size={10} fill="#fff" /> MÁS POPULAR
                   </span>
                 </div>
               )}
@@ -70,9 +81,9 @@ export function ModalCreditos({ onClose }: Props) {
                   <p className="text-xs mt-0.5" style={{ color: "#52525b" }}>{plan.descripcion}</p>
                 </div>
                 <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl"
-                  style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.15)" }}>
-                  <Zap size={12} style={{ color: "#ffd700" }} />
-                  <span className="font-bold text-sm" style={{ color: "#ffd700" }}>{plan.creditos}</span>
+                  style={{ background: PURPLE_DIM, border: `1px solid ${PURPLE_BORDER}` }}>
+                  <Zap size={12} style={{ color: PURPLE_LIGHT }} />
+                  <span className="font-bold text-sm" style={{ color: PURPLE_LIGHT }}>{plan.creditos}</span>
                 </div>
               </div>
 
@@ -100,10 +111,10 @@ export function ModalCreditos({ onClose }: Props) {
               <button onClick={() => handleComprar(plan.id)} disabled={loading !== null}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: plan.popular ? "linear-gradient(135deg,#b8860b,#ffd700)" : "rgba(255,255,255,0.06)",
-                  color: plan.popular ? "#000" : "#a1a1aa",
+                  background: plan.popular ? GRAD : "rgba(255,255,255,0.06)",
+                  color: plan.popular ? "#fff" : "#a1a1aa",
                   border: plan.popular ? "none" : "1px solid rgba(255,255,255,0.08)",
-                  boxShadow: plan.popular ? "0 4px 20px rgba(255,215,0,0.2)" : "none",
+                  boxShadow: plan.popular ? "0 4px 20px rgba(124,58,237,0.3)" : "none",
                 }}>
                 {loading === plan.id ? (
                   <><Loader2 size={15} className="animate-spin" /> Procesando...</>
