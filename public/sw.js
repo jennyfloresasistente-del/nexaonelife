@@ -1,5 +1,6 @@
-const CACHE_NAME = "nexaonelife-v1";
-const STATIC_ASSETS = ["/", "/manifest.json", "/logo.png", "/logo-sm.png"];
+// NexaOne Life Service Worker v3 — NO cachea páginas HTML
+const CACHE_NAME = "nexaonelife-v3";
+const STATIC_ASSETS = ["/manifest.json", "/logo.png", "/logo-sm.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -18,10 +19,31 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
-  // Solo cachear assets estáticos, no API calls
-  if (url.pathname.startsWith("/api/")) return;
+
+  // Nunca interceptar: peticiones no-GET, API, páginas HTML, rutas Next.js
+  if (
+    event.request.method !== "GET" ||
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/_next/") ||
+    url.pathname === "/" ||
+    url.pathname.startsWith("/admin") ||
+    url.pathname.startsWith("/pago") ||
+    url.pathname.startsWith("/preview") ||
+    (event.request.headers.get("accept") || "").includes("text/html")
+  ) {
+    return; // El navegador maneja normalmente, sin caché
+  }
+
+  // Solo cachear imágenes y assets estáticos
+  const isStaticAsset =
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".jpg") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".ico") ||
+    url.pathname === "/manifest.json";
+
+  if (!isStaticAsset) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
