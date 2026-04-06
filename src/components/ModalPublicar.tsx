@@ -66,12 +66,12 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-      <div className="rounded-2xl w-full max-w-md overflow-hidden" style={{ background: "#0a0a0a", border: "1px solid rgba(255,215,0,0.15)", boxShadow: "0 0 80px rgba(255,215,0,0.05)" }}>
+      <div className="rounded-2xl w-full max-w-md overflow-hidden" style={{ background: "#0a0a0f", border: "1px solid rgba(124,58,237,0.25)", boxShadow: "0 0 60px rgba(124,58,237,0.2)" }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b" style={{ borderColor: "rgba(255,215,0,0.1)" }}>
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)" }}>
-              <Globe size={16} style={{ color: "#000" }} />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)", boxShadow: "0 0 16px rgba(124,58,237,0.4)" }}>
+              <Globe size={16} style={{ color: "#fff" }} />
             </div>
             <div>
               <h2 className="font-black text-sm" style={{ color: "#e4e4e7" }}>Publicar App</h2>
@@ -88,7 +88,7 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
             <>
               <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <p className="text-sm leading-relaxed" style={{ color: "#71717a" }}>
-                  Tu app se publicará en <span className="font-semibold" style={{ color: "#ffd700" }}>preview.nexaoneia.com</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
+                  Tu app se publicará en <span className="font-semibold" style={{ color: "#06b6d4" }}>preview.nexaoneia.com</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
                 </p>
               </div>
 
@@ -100,7 +100,7 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
 
               <button onClick={handlePublicar} disabled={loading}
                 className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl transition-all disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)", color: "#000", boxShadow: "0 4px 20px rgba(255,215,0,0.2)" }}>
+                style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)", color: "#fff", boxShadow: "0 0 20px rgba(124,58,237,0.4)" }}>
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Globe size={16} />}
                 {loading ? "Publicando..." : "Publicar ahora"}
               </button>
@@ -114,7 +114,7 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
                   <span className="text-xs font-bold" style={{ color: "#22c55e" }}>App publicada</span>
                 </div>
                 <div className="flex items-center gap-2 rounded-xl px-3 py-2.5" style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <span className="text-xs flex-1 truncate" style={{ color: "#ffd700" }}>{url}</span>
+                  <span className="text-xs flex-1 truncate" style={{ color: "#a78bfa" }}>{url}</span>
                   <button onClick={handleCopy} className="shrink-0 transition-colors" style={{ color: "#52525b" }}>
                     {copied ? <Check size={14} style={{ color: "#22c55e" }} /> : <Copy size={14} />}
                   </button>
@@ -140,7 +140,7 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
                 </a>
                 <button onClick={handleShare}
                   className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)", color: "#000" }}>
+                  style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)", color: "#fff", boxShadow: "0 0 16px rgba(124,58,237,0.3)" }}>
                   <Share2 size={14} /> Compartir
                 </button>
               </div>

@@ -33,14 +33,14 @@ export function HistorialVersiones({ versions, currentHtml, onRestaurar, onClose
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md rounded-2xl border overflow-hidden shadow-2xl"
-        style={{ background: "#0a0a0a", borderColor: "#1a1a1a" }}>
+        style={{ background: "#0a0a0f", borderColor: "rgba(124,58,237,0.25)", boxShadow: "0 0 60px rgba(124,58,237,0.15)" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "#1a1a1a" }}>
           <div className="flex items-center gap-2">
-            <Clock size={15} style={{ color: "#ffd700" }} />
+            <Clock size={15} style={{ color: "#a78bfa" }} />
             <span className="font-bold text-white text-sm">Historial de versiones</span>
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(255,215,0,0.1)", color: "#b8860b", border: "1px solid rgba(255,215,0,0.2)" }}>
+            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(124,58,237,0.12)", color: "#a78bfa", border: "1px solid rgba(124,58,237,0.25)" }}>
               {versions.length} versiones
             </span>
           </div>
@@ -57,20 +57,20 @@ export function HistorialVersiones({ versions, currentHtml, onRestaurar, onClose
             return (
               <div key={v.id}
                 className="flex items-center gap-3 px-5 py-3.5 border-b transition-colors"
-                style={{ borderColor: "#111", background: isCurrent ? "rgba(255,215,0,0.04)" : "transparent" }}>
+                style={{ borderColor: "rgba(255,255,255,0.05)", background: isCurrent ? "rgba(124,58,237,0.06)" : "transparent" }}>
 
                 {/* Indicador */}
                 <div className="w-2 h-2 rounded-full shrink-0"
-                  style={{ background: isCurrent ? "#ffd700" : i === 0 ? "#52525b" : "#27272a" }} />
+                  style={{ background: isCurrent ? "#a78bfa" : i === 0 ? "#52525b" : "#27272a" }} />
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold" style={{ color: isCurrent ? "#ffd700" : "#a1a1aa" }}>
+                    <span className="text-xs font-semibold" style={{ color: isCurrent ? "#a78bfa" : "#a1a1aa" }}>
                       {v.label}
                     </span>
                     {isCurrent && (
-                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: "rgba(255,215,0,0.1)", color: "#b8860b" }}>
+                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: "rgba(124,58,237,0.12)", color: "#a78bfa" }}>
                         actual
                       </span>
                     )}
@@ -84,9 +84,9 @@ export function HistorialVersiones({ versions, currentHtml, onRestaurar, onClose
                     onClick={() => handleRestaurar(v)}
                     className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0"
                     style={{
-                      background: isConfirming ? "rgba(255,215,0,0.15)" : "rgba(255,255,255,0.05)",
-                      border: `1px solid ${isConfirming ? "rgba(255,215,0,0.3)" : "rgba(255,255,255,0.08)"}`,
-                      color: isConfirming ? "#ffd700" : "#71717a",
+                      background: isConfirming ? "rgba(124,58,237,0.15)" : "rgba(255,255,255,0.05)",
+                      border: `1px solid ${isConfirming ? "rgba(124,58,237,0.4)" : "rgba(255,255,255,0.08)"}`,
+                      color: isConfirming ? "#a78bfa" : "#71717a",
                     }}>
                     {isConfirming ? <Check size={11} /> : <RotateCcw size={11} />}
                     {isConfirming ? "Confirmar" : "Restaurar"}

@@ -333,15 +333,13 @@ export default function NexaOnePage() {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-xl flex items-center justify-center"
-              style={{ background: GRAD_PRIMARY, boxShadow: "0 0 16px rgba(124,58,237,0.5)" }}>
-              <Image src="/logo-sm.png" alt="Nexa One Life" width={20} height={20} className="rounded-lg" priority />
-            </div>
+            <Image src="/logo.png" alt="Nexa One Life" width={36} height={36} className="rounded-xl" priority
+              style={{ filter: "drop-shadow(0 0 8px rgba(124,58,237,0.6))" }} />
             <div className="flex items-baseline gap-0.5">
               {[
                 ["Nexa", "linear-gradient(90deg,#a78bfa,#7c3aed)"],
                 ["One",  "linear-gradient(90deg,#06b6d4,#0891b2)"],
-                ["Life", "linear-gradient(90deg,#f59e0b,#fbbf24)"],
+                ["Life", "linear-gradient(90deg,#a78bfa,#06b6d4)"],
               ].map(([word, grad]) => (
                 <span key={word} className="font-black text-sm tracking-tight"
                   style={{ background: grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
