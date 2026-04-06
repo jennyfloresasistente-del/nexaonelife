@@ -18,6 +18,23 @@ export const PLANES: Plan[] = [
 
 export const COSTO_POR_GENERACION = 1;
 
+// Cálculo dinámico de créditos según complejidad del prompt
+export function calcularCosto(prompt: string): number {
+  const lower = prompt.toLowerCase();
+  const palabras = prompt.split(/\s+/).length;
+  
+  // Keywords de alta complejidad (3 créditos)
+  const altaComplejidad = ['dashboard', 'crm', 'ecommerce', 'e-commerce', 'tienda online', 'sistema completo', 'saas', 'plataforma', 'marketplace', 'erp', 'inventario completo', 'punto de venta', 'pos'];
+  if (altaComplejidad.some(k => lower.includes(k)) || palabras > 80) return 3;
+  
+  // Keywords de media complejidad (2 créditos)
+  const mediaComplejidad = ['sistema', 'aplicación', 'app completa', 'con base de datos', 'con login', 'con autenticación', 'catálogo', 'agenda', 'citas', 'reservaciones', 'facturación'];
+  if (mediaComplejidad.some(k => lower.includes(k)) || palabras > 40) return 2;
+  
+  // Baja complejidad (1 crédito)
+  return 1;
+}
+
 export interface Version {
   id: string;
   html: string;
@@ -62,7 +79,7 @@ interface UserStore {
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
-      creditos: 5,
+      creditos: 10,
       githubToken: "",
       githubRepo: "nexaonelife-app",
       generaciones: 0,
@@ -71,10 +88,11 @@ export const useUserStore = create<UserStore>()(
 
       addCreditos: (n) => set((s) => ({ creditos: s.creditos + n })),
 
-      consumirCredito: () => {
+      consumirCredito: (costo?: number) => {
         const { creditos } = get();
-        if (creditos <= 0) return false;
-        set((s) => ({ creditos: s.creditos - COSTO_POR_GENERACION }));
+        const costoReal = costo ?? COSTO_POR_GENERACION;
+        if (creditos < costoReal) return false;
+        set((s) => ({ creditos: s.creditos - costoReal }));
         return true;
       },
 

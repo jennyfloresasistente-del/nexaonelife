@@ -59,7 +59,6 @@ function getSugerenciasContextuales(html: string): string[] {
     sugerencias.push("Añade notificaciones visuales para confirmar acciones");
   }
 
-  // Siempre agregar algunas generales si hay pocas
   if (sugerencias.length < 3) {
     sugerencias.push("Mejora los colores y tipografía para una mejor experiencia");
     sugerencias.push("Agrega transiciones y animaciones suaves");
@@ -77,7 +76,6 @@ export function Sugerencias({ html, onSugerencia }: Props) {
 
   useEffect(() => {
     if (!html) return;
-    // Sugerencias contextuales instantáneas
     const contextuales = getSugerenciasContextuales(html);
     setSugerencias(contextuales);
     setVisible(true);
@@ -112,7 +110,6 @@ export function Sugerencias({ html, onSugerencia }: Props) {
         fullText += decoder.decode(value, { stream: true });
       }
 
-      // Parsear la lista numerada
       const lines = fullText
         .split("\n")
         .filter((l) => /^\d+\./.test(l.trim()))
@@ -125,7 +122,6 @@ export function Sugerencias({ html, onSugerencia }: Props) {
         setSugerencias(lines);
       }
     } catch {
-      // Usar sugerencias rápidas como fallback
       const random = [...SUGERENCIAS_RAPIDAS].sort(() => Math.random() - 0.5).slice(0, 5);
       setSugerencias(random);
     } finally {
@@ -136,23 +132,21 @@ export function Sugerencias({ html, onSugerencia }: Props) {
   if (!html || !visible || sugerencias.length === 0) return null;
 
   return (
-    <div className="border-t border-gray-800 bg-gray-900/50">
+    <div className="border-t shrink-0" style={{ borderColor: "#111", background: "rgba(0,0,0,0.6)" }}>
       <div className="px-4 py-3">
         <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
-            <Lightbulb size={13} className="text-yellow-400" />
-            <span className="text-xs font-bold text-gray-300">Sugerencias para mejorar tu app</span>
+            <Lightbulb size={13} style={{ color: "#ffd700" }} />
+            <span className="text-xs font-bold" style={{ color: "#71717a" }}>Sugerencias para mejorar</span>
           </div>
           <div className="flex items-center gap-1">
-            <button
-              onClick={generarConIA}
-              disabled={loading}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 transition-all disabled:opacity-50"
-            >
+            <button onClick={generarConIA} disabled={loading}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-all disabled:opacity-50"
+              style={{ color: "#b8860b" }}>
               {loading ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
               {loading ? "Analizando..." : "Analizar con IA"}
             </button>
-            <button onClick={() => setVisible(false)} className="p-1 text-gray-600 hover:text-gray-400 transition-colors">
+            <button onClick={() => setVisible(false)} className="p-1 transition-colors" style={{ color: "#27272a" }}>
               <X size={13} />
             </button>
           </div>
@@ -160,14 +154,12 @@ export function Sugerencias({ html, onSugerencia }: Props) {
 
         <div className="space-y-1.5">
           {sugerencias.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => onSugerencia(s)}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800/60 hover:bg-gray-800 border border-gray-700/30 hover:border-indigo-500/40 text-left transition-all group"
-            >
-              <Sparkles size={11} className="text-indigo-400 shrink-0 group-hover:text-indigo-300" />
-              <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors flex-1">{s}</span>
-              <ChevronRight size={11} className="text-gray-600 group-hover:text-indigo-400 shrink-0 transition-colors" />
+            <button key={i} onClick={() => onSugerencia(s)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all group"
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}>
+              <Sparkles size={11} style={{ color: "#b8860b" }} className="shrink-0" />
+              <span className="text-xs flex-1 transition-colors" style={{ color: "#52525b" }}>{s}</span>
+              <ChevronRight size={11} style={{ color: "#27272a" }} className="shrink-0" />
             </button>
           ))}
         </div>
