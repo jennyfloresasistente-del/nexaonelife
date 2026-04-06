@@ -218,17 +218,17 @@ export default function NexaOnePage() {
   const modelColor = model === "claude" ? "text-orange-400" : "text-green-400";
 
   return (
-    <div className="flex flex-col h-screen bg-gray-950 overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden" style={{background:'#000000'}}>
       {/* ── Header ── */}
-      <header className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 bg-gray-950/90 backdrop-blur-sm z-10 shrink-0">
+      <header className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 backdrop-blur-sm z-10 shrink-0" style={{background:'#000000'}}>
         <div className="flex items-center gap-2.5">
           <Image src="/logo-sm.png" alt="Nexa One Life" width={34} height={34} className="rounded-xl" priority />
           <div className="flex items-baseline gap-1">
-            <span className="font-black text-white text-lg tracking-tight">Nexa</span>
-            <span className="font-black text-indigo-400 text-lg tracking-tight">One</span>
-            <span className="font-black text-purple-400 text-lg tracking-tight">Life</span>
+            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#c0c0c0,#e8e8e8,#a8a8a8)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Nexa</span>
+            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#b8860b,#ffd700,#daa520)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>One</span>
+            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#cd7f32,#e8a96e,#b87333)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Life</span>
           </div>
-          <span className="hidden sm:inline text-xs text-gray-500 border border-gray-700 rounded-full px-2 py-0.5">Beta</span>
+
         </div>
 
         <div className="flex items-center gap-2">
@@ -291,7 +291,7 @@ export default function NexaOnePage() {
       {/* ── Main ── */}
       <div className="flex flex-1 overflow-hidden">
         {/* ── Chat ── */}
-        <div className="flex flex-col w-full md:w-[400px] lg:w-[440px] shrink-0 border-r border-gray-800">
+        <div className="flex flex-col w-full md:w-[400px] lg:w-[440px] shrink-0 border-r border-gray-800" style={{background:'#000000'}}>
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             {messages.length === 0 && showExamples && (
               <div>
@@ -339,13 +339,13 @@ export default function NexaOnePage() {
                     extractHtml(msg.content) ? (
                       <div>
                         <div className="flex items-center gap-1.5 text-green-400 text-xs font-semibold mb-1.5">
-                          <Check size={11} /> App generada exitosamente
+                          <Check size={11} /> Contenido generado exitosamente
                         </div>
                         {extractExplanation(msg.content) && (
                           <p className="text-gray-400 text-xs leading-relaxed">{extractExplanation(msg.content)}</p>
                         )}
                         <button onClick={() => setActiveTab("preview")} className="mt-2 text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
-                          <Eye size={11} /> Ver preview →
+                          <Eye size={11} /> Ver escrito →
                         </button>
                       </div>
                     ) : (
@@ -366,7 +366,7 @@ export default function NexaOnePage() {
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm px-4 py-3 bg-gray-800 text-gray-200 text-sm leading-relaxed">
                   {extractHtml(streamingText) ? (
                     <div className="flex items-center gap-1.5 text-indigo-400 text-xs">
-                      <Loader2 size={12} className="animate-spin" /> Construyendo tu app...
+                      <Loader2 size={12} className="animate-spin" /> Generando tu contenido...
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap typing-cursor">{streamingText}</p>
@@ -474,7 +474,7 @@ export default function NexaOnePage() {
         </div>
 
         {/* ── Preview / Código ── */}
-        <div className="flex-1 flex flex-col bg-gray-900 overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden" style={{background:'#000000'}}>
           {/* Tabs + acciones */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 shrink-0 gap-2">
             <div className="flex gap-1">
@@ -524,9 +524,9 @@ export default function NexaOnePage() {
                 <div className="w-20 h-20 rounded-3xl bg-gray-800/80 flex items-center justify-center mb-5 border border-gray-700/50">
                   <Moon size={30} className="text-gray-700" />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-400 mb-2">Tu app aparecerá aquí</h2>
+                  <h2 className="text-lg font-semibold text-gray-400 mb-2">Tu escrito aparecerá aquí</h2>
                 <p className="text-gray-600 text-sm max-w-xs leading-relaxed">
-                  Describe lo que quieres construir en el chat y Nexa One Life lo generará en tiempo real.
+                  Describe lo que quieres crear en el chat y Nexa One Life lo generará en tiempo real.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2 justify-center">
                   {["Dashboard", "Landing Page", "Juego", "Calculadora", "Portfolio"].map((tag) => (
@@ -535,15 +535,22 @@ export default function NexaOnePage() {
                 </div>
               </div>
             ) : activeTab === "preview" ? (
-              <iframe
-                key={currentHtml.length}
-                srcDoc={currentHtml}
-                className="w-full h-full border-0 bg-white"
-                sandbox="allow-scripts allow-same-origin allow-forms"
-                title="Preview de la app generada"
-              />
+              <div className="h-full overflow-auto p-6" style={{background:'#000000'}}>
+                <div
+                  className="prose prose-invert max-w-none text-sm leading-relaxed"
+                  style={{color:'#d4d4d4',fontFamily:'Georgia, serif',lineHeight:'1.8'}}
+                  dangerouslySetInnerHTML={{
+                    __html: currentHtml
+                      .replace(/<style[\s\S]*?<\/style>/gi, '')
+                      .replace(/<script[\s\S]*?<\/script>/gi, '')
+                      .replace(/<html[^>]*>|<\/html>|<head[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, '')
+                      .replace(/background[^;:]*:[^;]*/gi, '')
+                      .replace(/color\s*:\s*[^;]*/gi, '')
+                  }}
+                />
+              </div>
             ) : (
-              <div className="h-full overflow-auto bg-gray-950">
+              <div className="h-full overflow-auto" style={{background:'#000000'}}>
                 <pre className="p-5 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-wrap break-words">
                   <code>{currentHtml}</code>
                 </pre>

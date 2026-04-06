@@ -62,7 +62,7 @@ export default function RootLayout({
           }
         ` }} />
       </head>
-      <body className="min-h-full flex flex-col bg-gray-950 text-white antialiased" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+      <body className="min-h-full flex flex-col text-white antialiased" style={{fontFamily: 'system-ui, -apple-system, sans-serif', background:'#000000'}}>
         {children}
       </body>
     </html>
