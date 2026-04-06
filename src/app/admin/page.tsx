@@ -116,13 +116,27 @@ export default function AdminPage() {
     const newHistory = [entry, ...creditHistory].slice(0, 50);
     setCreditHistory(newHistory);
     localStorage.setItem("nexaonelife_credit_history", JSON.stringify(newHistory));
-    const userStore = localStorage.getItem("nexaonelife-user");
-    if (userStore) {
-      try {
-        const parsed = JSON.parse(userStore);
-        parsed.state.creditos = (parsed.state.creditos || 0) + manualCredit.creditos;
-        localStorage.setItem("nexaonelife-user", JSON.stringify(parsed));
-      } catch {}
+    // Intentar actualizar en la tienda v2 (nombre actual)
+    const storeKeys = ["nexaonelife-user-v2", "nexaonelife-user"];
+    let updated = false;
+    for (const key of storeKeys) {
+      const userStore = localStorage.getItem(key);
+      if (userStore) {
+        try {
+          const parsed = JSON.parse(userStore);
+          if (parsed?.state) {
+            parsed.state.creditos = (parsed.state.creditos || 0) + manualCredit.creditos;
+            localStorage.setItem(key, JSON.stringify(parsed));
+            updated = true;
+            break;
+          }
+        } catch {}
+      }
+    }
+    if (!updated) {
+      // Crear entrada si no existe
+      const newStore = { state: { creditos: manualCredit.creditos }, version: 2 };
+      localStorage.setItem("nexaonelife-user-v2", JSON.stringify(newStore));
     }
     setCreditMsg(`${manualCredit.creditos} créditos asignados a "${manualCredit.userId}"`);
     setManualCredit({ userId: "", creditos: 0, nota: "" });

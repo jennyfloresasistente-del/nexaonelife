@@ -153,6 +153,7 @@ export default function NexaOnePage() {
   const [showPlantillas, setShowPlantillas] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [showProyectos, setShowProyectos] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("split");
   const [device, setDevice] = useState<Device>("desktop");
   const [zoom, setZoom] = useState(100);
@@ -399,7 +400,8 @@ export default function NexaOnePage() {
           <PWAInstall />
 
           {/* Iniciar sesión */}
-          <a href="/login"
+          <button
+            onClick={() => setShowLoginModal(true)}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
             style={{
               background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2))",
@@ -408,7 +410,7 @@ export default function NexaOnePage() {
             }}>
             <LogIn size={11} />
             <span className="hidden sm:inline">Iniciar sesión</span>
-          </a>
+          </button>
 
           <a href="/admin" className="p-2 rounded-lg transition-all"
             style={{ color: C.dim, background: C.surface, border: `1px solid ${C.border}` }}>
@@ -858,6 +860,48 @@ export default function NexaOnePage() {
         />
       )}
       <PWAInstall />
+
+      {/* ── MODAL LOGIN ─────────────────────────────────────────────────── */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}
+          onClick={() => setShowLoginModal(false)}>
+          <div className="w-full max-w-sm rounded-2xl p-6"
+            style={{ background: "#0a0a0f", border: "1px solid rgba(124,58,237,0.3)", boxShadow: "0 0 60px rgba(124,58,237,0.15)" }}
+            onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)" }}>
+                <LogIn size={24} color="white" />
+              </div>
+              <h2 className="text-xl font-black text-white">Iniciar sesión</h2>
+              <p className="text-xs mt-1" style={{ color: "#64748b" }}>Accede a tu cuenta de Nexa One Life</p>
+            </div>
+            <div className="space-y-3 mb-4">
+              <input type="email" placeholder="tu@correo.com"
+                className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9" }} />
+              <input type="password" placeholder="Contraseña"
+                className="w-full rounded-xl px-4 py-3 text-sm outline-none"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#f1f5f9" }} />
+            </div>
+            <button className="w-full py-3 rounded-xl font-bold text-sm text-white mb-3"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#06b6d4)", boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}
+              onClick={() => setShowLoginModal(false)}>
+              Entrar
+            </button>
+            <p className="text-center text-xs" style={{ color: "#475569" }}>
+              ¿No tienes cuenta?{" "}
+              <span className="cursor-pointer" style={{ color: "#a78bfa" }}>Regístrate gratis</span>
+            </p>
+            <button onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 p-1 rounded-lg"
+              style={{ color: "#475569" }}>
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
