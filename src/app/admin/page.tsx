@@ -167,7 +167,7 @@ export default function AdminPage() {
   // ── Login ──
   if (!autenticado) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{background:'#000'}}>
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <Image src="/logo.png" alt="Nexa One Life" width={72} height={72} className="mx-auto mb-4 rounded-2xl" />
@@ -231,9 +231,9 @@ export default function AdminPage() {
 
   // ── Panel Admin ──
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen text-white" style={{background:'#000'}}>
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="flex items-center justify-between px-6 py-4 border-b sticky top-0 z-10" style={{background:'#000',borderColor:'#1a1a1a'}}>
         <div className="flex items-center gap-3">
           <Image src="/logo-sm.png" alt="Nexa One Life" width={32} height={32} className="rounded-xl" />
           <div>

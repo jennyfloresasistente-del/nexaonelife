@@ -1,12 +1,11 @@
 "use client";
 
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Send, Sparkles, Code2, Eye, Download, Trash2, Copy, Check,
-  ChevronDown, Zap, X, Moon, Loader2, GitBranch, QrCode,
-  CreditCard, TriangleAlert, Globe,
+  X, Loader2, GitBranch, CreditCard, TriangleAlert, Globe,
+  Settings, Moon, ArrowRight,
 } from "lucide-react";
 import { useUserStore, COSTO_POR_GENERACION } from "@/lib/store";
 import { ModalCreditos } from "@/components/ModalCreditos";
@@ -16,19 +15,28 @@ import { Sugerencias } from "@/components/Sugerencias";
 import { ModalPublicar } from "@/components/ModalPublicar";
 import { Plantillas } from "@/components/Plantillas";
 
-type Model = "gpt4" | "claude";
 type Message = { role: "user" | "assistant"; content: string };
 type Tab = "preview" | "code";
 
+// Auto-selección de modelo por complejidad del prompt
+function selectModel(prompt: string): "openai" | "claude" {
+  const lower = prompt.toLowerCase();
+  const complexKeywords = [
+    "dashboard", "sistema", "crm", "erp", "ecommerce", "tienda", "inventario",
+    "complejo", "avanzado", "profesional", "empresa", "negocio", "analytics",
+    "base de datos", "autenticación", "multi", "plataforma", "saas",
+  ];
+  const isComplex = complexKeywords.some((k) => lower.includes(k)) || prompt.length > 200;
+  return isComplex ? "claude" : "openai";
+}
+
 const EXAMPLE_PROMPTS = [
   "Crea un dashboard de ventas con gráficas y estadísticas",
-  "Haz una app de lista de tareas con drag & drop",
-  "Diseña una landing page para una startup de tecnología",
-  "Crea una calculadora con diseño moderno y animaciones",
+  "Haz una landing page para una startup de tecnología",
+  "Diseña una calculadora con animaciones modernas",
+  "Crea un portafolio personal minimalista y elegante",
   "Haz un juego de memoria con cartas coloridas",
-  "Diseña un portafolio personal minimalista",
-  "Crea una app de clima con animaciones bonitas",
-  "Haz un generador de contraseñas seguras",
+  "Diseña un generador de contraseñas seguras",
 ];
 
 function extractHtml(text: string): string {
@@ -45,20 +53,15 @@ function extractExplanation(text: string): string {
 export default function NexaOnePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [model, setModel] = useState<Model>("gpt4");
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentHtml, setCurrentHtml] = useState("");
   const [streamingText, setStreamingText] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("preview");
   const [copied, setCopied] = useState(false);
-  const [showModelMenu, setShowModelMenu] = useState(false);
   const [showExamples, setShowExamples] = useState(true);
   const [showModalCreditos, setShowModalCreditos] = useState(false);
   const [showModalGitHub, setShowModalGitHub] = useState(false);
   const [showModalPublicar, setShowModalPublicar] = useState(false);
-  const [showQR, setShowQR] = useState(false);
-  const [qrDataUrl, setQrDataUrl] = useState("");
-  const [qrLoading, setQrLoading] = useState(false);
   const [noCreditos, setNoCreditos] = useState(false);
   const [showPlantillas, setShowPlantillas] = useState(false);
 
@@ -83,12 +86,8 @@ export default function NexaOnePage() {
     const prompt = input.trim();
     if (!prompt || isGenerating) return;
 
-    // Verificar créditos
     const ok = consumirCredito();
-    if (!ok) {
-      setNoCreditos(true);
-      return;
-    }
+    if (!ok) { setNoCreditos(true); return; }
 
     setInput("");
     setShowExamples(false);
@@ -100,13 +99,16 @@ export default function NexaOnePage() {
     setIsGenerating(true);
     setStreamingText("");
 
+    // Auto-selección de modelo por complejidad
+    const autoModel = selectModel(prompt);
+
     abortRef.current = new AbortController();
 
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, model: model === "claude" ? "claude" : "openai" }),
+        body: JSON.stringify({ messages: newMessages, model: autoModel }),
         signal: abortRef.current.signal,
       });
 
@@ -136,216 +138,179 @@ export default function NexaOnePage() {
       incrementarGeneraciones();
 
       const finalHtml = extractHtml(fullText);
-      if (finalHtml) {
-        setCurrentHtml(finalHtml);
-        setActiveTab("preview");
-      }
+      if (finalHtml) { setCurrentHtml(finalHtml); setActiveTab("preview"); }
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       const errorMsg = err instanceof Error ? err.message : "Error desconocido";
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: `❌ **Error:** ${errorMsg}` },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: `❌ **Error:** ${errorMsg}` }]);
     } finally {
       setIsGenerating(false);
       abortRef.current = null;
     }
-  }, [input, messages, model, isGenerating, consumirCredito, incrementarGeneraciones]);
+  }, [input, messages, isGenerating, consumirCredito, incrementarGeneraciones]);
 
-  const handleStop = () => {
-    abortRef.current?.abort();
-    setIsGenerating(false);
-    setStreamingText("");
-  };
-
-  const handleCopy = async () => {
-    if (!currentHtml) return;
-    await navigator.clipboard.writeText(currentHtml);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
+  const handleStop = () => { abortRef.current?.abort(); setIsGenerating(false); setStreamingText(""); };
+  const handleCopy = async () => { if (!currentHtml) return; await navigator.clipboard.writeText(currentHtml); setCopied(true); setTimeout(() => setCopied(false), 2000); };
   const handleDownload = () => {
     if (!currentHtml) return;
     const blob = new Blob([currentHtml], { type: "text/html" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "nexaonelife-app.html";
-    a.click();
+    const a = document.createElement("a"); a.href = url; a.download = "nexaonelife.html"; a.click();
     URL.revokeObjectURL(url);
   };
-
-  const handleClear = () => {
-    setMessages([]);
-    setCurrentHtml("");
-    setStreamingText("");
-    setShowExamples(true);
-    setNoCreditos(false);
-  };
-
-  const handleGenerateQR = async () => {
-    if (!currentHtml) return;
-    setQrLoading(true);
-    setShowQR(true);
-    try {
-      // Crear un blob URL temporal para el QR
-      const blob = new Blob([currentHtml], { type: "text/html" });
-      const blobUrl = URL.createObjectURL(blob);
-      const res = await fetch("/api/qr", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: "https://nexaonelife.app/preview" }),
-      });
-      const data = await res.json();
-      setQrDataUrl(data.qr || "");
-    } catch {
-      setQrDataUrl("");
-    } finally {
-      setQrLoading(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleGenerate();
-    }
-  };
-
-  const modelLabel = model === "claude" ? "Claude Opus" : "GPT-4o";
-  const modelColor = model === "claude" ? "text-orange-400" : "text-green-400";
+  const handleClear = () => { setMessages([]); setCurrentHtml(""); setStreamingText(""); setShowExamples(true); setNoCreditos(false); };
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{background:'#000000'}}>
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 backdrop-blur-sm z-10 shrink-0" style={{background:'#000000'}}>
-        <div className="flex items-center gap-2.5">
-          <Image src="/logo-sm.png" alt="Nexa One Life" width={34} height={34} className="rounded-xl" priority />
-          <div className="flex items-baseline gap-1">
-            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#c0c0c0,#e8e8e8,#a8a8a8)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Nexa</span>
-            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#b8860b,#ffd700,#daa520)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>One</span>
-            <span className="font-black text-lg tracking-tight" style={{background:'linear-gradient(90deg,#cd7f32,#e8a96e,#b87333)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Life</span>
-          </div>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: "#000" }}>
 
+      {/* ── Header estilo Lovable ── */}
+      <header className="flex items-center justify-between px-5 py-3 border-b shrink-0"
+        style={{ background: "#000", borderColor: "#1a1a1a" }}>
+
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <Image src="/logo-sm.png" alt="Nexa One Life" width={32} height={32} className="rounded-xl" priority />
+          <div className="flex items-baseline gap-1">
+            <span className="font-black text-base tracking-tight"
+              style={{ background: "linear-gradient(90deg,#c0c0c0,#e8e8e8,#a8a8a8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              Nexa
+            </span>
+            <span className="font-black text-base tracking-tight"
+              style={{ background: "linear-gradient(90deg,#b8860b,#ffd700,#daa520)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              One
+            </span>
+            <span className="font-black text-base tracking-tight"
+              style={{ background: "linear-gradient(90deg,#cd7f32,#e8a96e,#b87333)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              Life
+            </span>
+          </div>
         </div>
 
+        {/* Acciones header */}
         <div className="flex items-center gap-2">
           {/* Créditos */}
           <button
             onClick={() => setShowModalCreditos(true)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-sm font-semibold transition-all ${
-              creditos <= 2
-                ? "bg-red-900/30 border-red-700/50 text-red-400 hover:bg-red-900/50"
-                : "bg-gray-800 border-gray-700 text-indigo-300 hover:bg-gray-700"
-            }`}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{
+              background: creditos <= 2 ? "rgba(127,29,29,0.3)" : "rgba(255,255,255,0.06)",
+              border: `1px solid ${creditos <= 2 ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`,
+              color: creditos <= 2 ? "#f87171" : "#a1a1aa",
+            }}
           >
-            <Zap size={13} />
+            <Sparkles size={11} />
             <span>{creditos} créditos</span>
-            {creditos <= 2 && <TriangleAlert size={12} className="text-red-400" />}
+            {creditos <= 2 && <TriangleAlert size={11} />}
           </button>
 
-          {/* Selector de modelo */}
-          <div className="relative">
-            <button
-              onClick={() => setShowModelMenu((v) => !v)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-sm transition-all"
-            >
-              <Zap size={13} className={modelColor} />
-              <span className={`font-semibold ${modelColor} hidden sm:inline`}>{modelLabel}</span>
-              <ChevronDown size={13} className="text-gray-500" />
-            </button>
-            {showModelMenu && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
-                <div className="p-1">
-                  {(["gpt4", "claude"] as Model[]).map((m) => (
-                    <button
-                      key={m}
-                      onClick={() => { setModel(m); setShowModelMenu(false); }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-xl hover:bg-gray-700 transition-colors ${model === m ? "bg-gray-700/60" : ""}`}
-                    >
-                      <Zap size={13} className={m === "claude" ? "text-orange-400" : "text-green-400"} />
-                      <div className="text-left">
-                        <div className={`font-semibold ${m === "claude" ? "text-orange-400" : "text-green-400"}`}>
-                          {m === "claude" ? "Claude Opus" : "GPT-4o"}
-                        </div>
-                        <div className="text-xs text-gray-500">{m === "claude" ? "Anthropic" : "OpenAI"}</div>
-                      </div>
-                      {model === m && <Check size={13} className="ml-auto text-indigo-400" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Botón Admin */}
+          <a
+            href="/admin"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "#a1a1aa",
+            }}
+          >
+            <Settings size={11} />
+            <span className="hidden sm:inline">Admin</span>
+          </a>
 
           {messages.length > 0 && (
-            <button onClick={handleClear} className="p-2 rounded-xl text-gray-500 hover:text-red-400 hover:bg-gray-800 transition-all" title="Nueva conversación">
-              <Trash2 size={15} />
+            <button onClick={handleClear}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ color: "#52525b", background: "transparent" }}
+              title="Nueva conversación"
+            >
+              <Trash2 size={14} />
             </button>
           )}
         </div>
       </header>
 
-      {/* ── Main ── */}
+      {/* ── Main layout ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* ── Chat ── */}
-        <div className="flex flex-col w-full md:w-[400px] lg:w-[440px] shrink-0 border-r border-gray-800" style={{background:'#000000'}}>
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+
+        {/* ── Panel izquierdo: Chat ── */}
+        <div className="flex flex-col w-full md:w-[400px] lg:w-[420px] shrink-0 border-r"
+          style={{ background: "#000", borderColor: "#1a1a1a" }}>
+
+          {/* Mensajes */}
+          <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+
+            {/* Estado vacío */}
             {messages.length === 0 && showExamples && (
-              <div>
-                <div className="text-center py-6">
-                  <Image src="/logo.png" alt="Nexa One Life" width={72} height={72} className="rounded-2xl mx-auto mb-3 shadow-xl shadow-indigo-500/25" />
-                  <h1 className="text-xl font-bold text-white mb-1">Nexa One Life</h1>
-                  <p className="text-gray-500 text-sm max-w-xs mx-auto leading-relaxed">
-                    Describe lo que quieres construir y la IA lo crea en segundos.
-                  </p>
-                  <div className="flex items-center justify-center gap-1.5 mt-3">
-                    <Zap size={13} className="text-indigo-400" />
-                    <span className="text-xs text-gray-400">
-                      Tienes <span className="text-indigo-400 font-bold">{creditos} créditos</span> disponibles
-                    </span>
+              <div className="fade-in">
+                <div className="text-center py-8">
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <Sparkles size={22} style={{ color: "#ffd700" }} />
                   </div>
+                  <h1 className="text-lg font-bold text-white mb-1.5">¿Qué quieres crear hoy?</h1>
+                  <p className="text-xs leading-relaxed max-w-xs mx-auto" style={{ color: "#52525b" }}>
+                    Describe tu idea y la IA la construirá en segundos.
+                  </p>
                 </div>
 
-                <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-2.5">Ejemplos</p>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "#3f3f46" }}>Ejemplos</p>
                 <div className="space-y-1.5">
                   {EXAMPLE_PROMPTS.map((ex) => (
                     <button
                       key={ex}
                       onClick={() => { setInput(ex); textareaRef.current?.focus(); }}
-                      className="w-full text-left px-3.5 py-2.5 rounded-xl bg-gray-800/50 hover:bg-gray-800 border border-gray-700/40 hover:border-indigo-500/50 text-sm text-gray-400 hover:text-gray-200 transition-all group"
+                      className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs transition-all group flex items-center justify-between"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "#71717a" }}
                     >
-                      <span className="text-indigo-500 mr-2 group-hover:text-indigo-400">›</span>
-                      {ex}
+                      <span className="group-hover:text-white transition-colors">{ex}</span>
+                      <ArrowRight size={11} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" style={{ color: "#ffd700" }} />
                     </button>
                   ))}
                 </div>
+
+                <button
+                  onClick={() => setShowPlantillas(true)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-all"
+                  style={{ background: "rgba(255,215,0,0.06)", border: "1px solid rgba(255,215,0,0.15)", color: "#b8860b" }}
+                >
+                  <Sparkles size={11} /> Ver plantillas de negocios
+                </button>
               </div>
             )}
 
+            {/* Mensajes */}
             {messages.map((msg, i) => (
-              <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
-                <div className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5 ${
-                  msg.role === "user" ? "bg-indigo-600 text-white" : "bg-gradient-to-br from-indigo-600 to-purple-600 text-white"
-                }`}>
-                  {msg.role === "user" ? "U" : <Sparkles size={12} />}
+              <div key={i} className={`flex gap-2.5 fade-in ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
+                  style={{
+                    background: msg.role === "user"
+                      ? "linear-gradient(135deg,#b8860b,#ffd700)"
+                      : "rgba(255,255,255,0.08)",
+                    color: msg.role === "user" ? "#000" : "#a1a1aa",
+                  }}>
+                  {msg.role === "user" ? "T" : <Sparkles size={10} />}
                 </div>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                  msg.role === "user" ? "bg-indigo-600 text-white rounded-tr-sm" : "bg-gray-800 text-gray-200 rounded-tl-sm"
-                }`}>
+                <div className="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed"
+                  style={{
+                    background: msg.role === "user" ? "rgba(255,215,0,0.1)" : "rgba(255,255,255,0.04)",
+                    border: `1px solid ${msg.role === "user" ? "rgba(255,215,0,0.2)" : "rgba(255,255,255,0.06)"}`,
+                    color: msg.role === "user" ? "#ffd700" : "#a1a1aa",
+                    borderRadius: msg.role === "user" ? "16px 4px 16px 16px" : "4px 16px 16px 16px",
+                  }}>
                   {msg.role === "assistant" ? (
                     extractHtml(msg.content) ? (
                       <div>
-                        <div className="flex items-center gap-1.5 text-green-400 text-xs font-semibold mb-1.5">
-                          <Check size={11} /> Contenido generado exitosamente
+                        <div className="flex items-center gap-1.5 text-xs font-semibold mb-1.5" style={{ color: "#22c55e" }}>
+                          <Check size={10} /> Generado exitosamente
                         </div>
                         {extractExplanation(msg.content) && (
-                          <p className="text-gray-400 text-xs leading-relaxed">{extractExplanation(msg.content)}</p>
+                          <p className="leading-relaxed" style={{ color: "#71717a" }}>{extractExplanation(msg.content)}</p>
                         )}
-                        <button onClick={() => setActiveTab("preview")} className="mt-2 text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
-                          <Eye size={11} /> Ver escrito →
+                        <button onClick={() => setActiveTab("preview")}
+                          className="mt-2 text-xs flex items-center gap-1 transition-colors"
+                          style={{ color: "#b8860b" }}>
+                          <Eye size={10} /> Ver resultado →
                         </button>
                       </div>
                     ) : (
@@ -358,15 +323,18 @@ export default function NexaOnePage() {
               </div>
             ))}
 
+            {/* Streaming */}
             {isGenerating && streamingText && (
-              <div className="flex gap-2.5">
-                <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-600 mt-0.5">
-                  <Sparkles size={12} className="text-white" />
+              <div className="flex gap-2.5 fade-in">
+                <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.08)" }}>
+                  <Sparkles size={10} style={{ color: "#ffd700" }} />
                 </div>
-                <div className="max-w-[85%] rounded-2xl rounded-tl-sm px-4 py-3 bg-gray-800 text-gray-200 text-sm leading-relaxed">
+                <div className="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", color: "#a1a1aa", borderRadius: "4px 16px 16px 16px" }}>
                   {extractHtml(streamingText) ? (
-                    <div className="flex items-center gap-1.5 text-indigo-400 text-xs">
-                      <Loader2 size={12} className="animate-spin" /> Generando tu contenido...
+                    <div className="flex items-center gap-1.5" style={{ color: "#b8860b" }}>
+                      <Loader2 size={11} className="animate-spin" /> Construyendo...
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap typing-cursor">{streamingText}</p>
@@ -375,15 +343,19 @@ export default function NexaOnePage() {
               </div>
             )}
 
+            {/* Dots loading */}
             {isGenerating && !streamingText && (
               <div className="flex gap-2.5">
-                <div className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-600 mt-0.5">
-                  <Sparkles size={12} className="text-white" />
+                <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.08)" }}>
+                  <Sparkles size={10} style={{ color: "#ffd700" }} />
                 </div>
-                <div className="rounded-2xl rounded-tl-sm px-4 py-3.5 bg-gray-800">
-                  <div className="flex gap-1.5 items-center">
-                    {[0, 200, 400].map((d) => (
-                      <div key={d} className="w-2 h-2 rounded-full bg-indigo-500 pulse-soft" style={{ animationDelay: `${d}ms` }} />
+                <div className="rounded-2xl px-3.5 py-3"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px 16px 16px 16px" }}>
+                  <div className="flex gap-1 items-center">
+                    {[0, 150, 300].map((d) => (
+                      <div key={d} className="w-1.5 h-1.5 rounded-full pulse-soft"
+                        style={{ background: "#ffd700", animationDelay: `${d}ms` }} />
                     ))}
                   </div>
                 </div>
@@ -392,15 +364,15 @@ export default function NexaOnePage() {
 
             {/* Sin créditos */}
             {noCreditos && (
-              <div className="bg-red-900/20 border border-red-700/50 rounded-2xl p-4 text-center">
-                <TriangleAlert size={24} className="text-red-400 mx-auto mb-2" />
-                <p className="text-red-300 font-semibold text-sm mb-1">Sin créditos disponibles</p>
-                <p className="text-gray-400 text-xs mb-3">Necesitas créditos para generar apps con IA.</p>
-                <button
-                  onClick={() => setShowModalCreditos(true)}
-                  className="flex items-center gap-1.5 mx-auto bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold px-4 py-2 rounded-xl transition-all"
-                >
-                  <CreditCard size={14} /> Comprar créditos
+              <div className="rounded-2xl p-4 text-center"
+                style={{ background: "rgba(127,29,29,0.2)", border: "1px solid rgba(239,68,68,0.3)" }}>
+                <TriangleAlert size={20} className="mx-auto mb-2" style={{ color: "#f87171" }} />
+                <p className="font-semibold text-sm mb-1" style={{ color: "#fca5a5" }}>Sin créditos</p>
+                <p className="text-xs mb-3" style={{ color: "#71717a" }}>Necesitas créditos para continuar.</p>
+                <button onClick={() => setShowModalCreditos(true)}
+                  className="flex items-center gap-1.5 mx-auto text-xs font-bold px-4 py-2 rounded-xl transition-all"
+                  style={{ background: "rgba(255,215,0,0.15)", border: "1px solid rgba(255,215,0,0.3)", color: "#ffd700" }}>
+                  <CreditCard size={12} /> Comprar créditos
                 </button>
               </div>
             )}
@@ -410,62 +382,48 @@ export default function NexaOnePage() {
 
           {/* Sugerencias */}
           {currentHtml && !isGenerating && (
-            <Sugerencias
-              html={currentHtml}
-              onSugerencia={(texto) => {
-                setInput(texto);
-                textareaRef.current?.focus();
-              }}
-            />
+            <Sugerencias html={currentHtml} onSugerencia={(texto) => { setInput(texto); textareaRef.current?.focus(); }} />
           )}
 
-          {/* Botón plantillas */}
-          <div className="px-3 pt-2 shrink-0">
-            <button
-              onClick={() => setShowPlantillas(true)}
-              className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 hover:border-indigo-500/40 text-xs font-semibold text-gray-400 hover:text-indigo-300 transition-all"
-            >
-              <Sparkles size={12} />
-              Ver plantillas de negocios
-            </button>
-          </div>
-
-          {/* Input */}
-          <div className="p-3 pt-2 border-t border-gray-800 shrink-0">
-            <div className="relative bg-gray-800 rounded-2xl border border-gray-700 focus-within:border-indigo-500/70 transition-all shadow-lg">
+          {/* Input estilo Lovable */}
+          <div className="p-3 border-t shrink-0" style={{ borderColor: "#1a1a1a" }}>
+            <div className="relative rounded-2xl transition-all"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => { setInput(e.target.value); autoResize(); }}
                 onKeyDown={handleKeyDown}
-                placeholder={creditos > 0 ? "Describe lo que quieres construir..." : "Sin créditos — compra más para continuar"}
+                placeholder={creditos > 0 ? "Describe lo que quieres crear..." : "Sin créditos — compra más para continuar"}
                 rows={1}
-                className="w-full bg-transparent text-white placeholder-gray-600 text-sm px-4 pt-3.5 pb-2 resize-none outline-none leading-relaxed"
+                className="w-full bg-transparent text-white placeholder-zinc-600 text-sm px-4 pt-3.5 pb-2 resize-none outline-none leading-relaxed"
                 style={{ maxHeight: "200px" }}
                 disabled={isGenerating || creditos <= 0}
               />
               <div className="flex items-center justify-between px-3 pb-2.5">
-                <span className="text-xs text-gray-600">
-                  {creditos > 0 ? `${COSTO_POR_GENERACION} crédito por generación` : "Sin créditos"}
+                <span className="text-xs" style={{ color: "#3f3f46" }}>
+                  {creditos > 0 ? `${COSTO_POR_GENERACION} crédito` : "Sin créditos"}
                 </span>
                 {isGenerating ? (
-                  <button onClick={handleStop} className="w-8 h-8 rounded-xl bg-red-600 hover:bg-red-500 flex items-center justify-center transition-colors">
-                    <X size={14} className="text-white" />
+                  <button onClick={handleStop}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
+                    style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.3)" }}>
+                    <X size={13} style={{ color: "#f87171" }} />
                   </button>
                 ) : creditos <= 0 ? (
-                  <button
-                    onClick={() => setShowModalCreditos(true)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all"
-                  >
-                    <CreditCard size={12} /> Comprar
+                  <button onClick={() => setShowModalCreditos(true)}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                    style={{ background: "rgba(255,215,0,0.15)", border: "1px solid rgba(255,215,0,0.3)", color: "#ffd700" }}>
+                    <CreditCard size={11} /> Comprar
                   </button>
                 ) : (
-                  <button
-                    onClick={handleGenerate}
-                    disabled={!input.trim()}
-                    className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-gray-700 disabled:to-gray-700 disabled:cursor-not-allowed flex items-center justify-center transition-all shadow-md shadow-indigo-500/20"
-                  >
-                    <Send size={14} className="text-white" />
+                  <button onClick={handleGenerate} disabled={!input.trim()}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center transition-all"
+                    style={{
+                      background: input.trim() ? "linear-gradient(135deg,#b8860b,#ffd700)" : "rgba(255,255,255,0.06)",
+                      cursor: input.trim() ? "pointer" : "not-allowed",
+                    }}>
+                    <Send size={12} style={{ color: input.trim() ? "#000" : "#3f3f46" }} />
                   </button>
                 )}
               </div>
@@ -473,45 +431,49 @@ export default function NexaOnePage() {
           </div>
         </div>
 
-        {/* ── Preview / Código ── */}
-        <div className="flex-1 flex flex-col overflow-hidden" style={{background:'#000000'}}>
-          {/* Tabs + acciones */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800 shrink-0 gap-2">
+        {/* ── Panel derecho: Preview / Código ── */}
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "#000" }}>
+
+          {/* Tabs */}
+          <div className="flex items-center justify-between px-4 py-2.5 border-b shrink-0 gap-2"
+            style={{ borderColor: "#1a1a1a" }}>
             <div className="flex gap-1">
               {(["preview", "code"] as Tab[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all ${
-                    activeTab === tab ? "bg-gray-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-300 hover:bg-gray-800"
-                  }`}
-                >
-                  {tab === "preview" ? <Eye size={13} /> : <Code2 size={13} />}
-                  {tab === "preview" ? "Preview" : "Código"}
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={{
+                    background: activeTab === tab ? "rgba(255,255,255,0.08)" : "transparent",
+                    color: activeTab === tab ? "#fff" : "#52525b",
+                    border: activeTab === tab ? "1px solid rgba(255,255,255,0.1)" : "1px solid transparent",
+                  }}>
+                  {tab === "preview" ? <Eye size={12} /> : <Code2 size={12} />}
+                  {tab === "preview" ? "Vista" : "Código"}
                 </button>
               ))}
             </div>
 
             {currentHtml && (
               <div className="flex items-center gap-1 flex-wrap">
-                <button onClick={handleCopy} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-gray-700 transition-all">
-                  {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+                <button onClick={handleCopy}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+                  style={{ color: "#52525b", background: "transparent" }}>
+                  {copied ? <Check size={11} style={{ color: "#22c55e" }} /> : <Copy size={11} />}
                   {copied ? "Copiado" : "Copiar"}
                 </button>
-                <button onClick={handleDownload} className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-gray-700 transition-all">
-                  <Download size={12} /> Descargar
+                <button onClick={handleDownload}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+                  style={{ color: "#52525b" }}>
+                  <Download size={11} /> Descargar
                 </button>
-                <button
-                  onClick={() => setShowModalGitHub(true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs text-gray-300 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all"
-                >
-                  <GitBranch size={12} /> GitHub
+                <button onClick={() => setShowModalGitHub(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs transition-all"
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#a1a1aa" }}>
+                  <GitBranch size={11} /> GitHub
                 </button>
-                <button
-                  onClick={() => setShowModalPublicar(true)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all shadow-md shadow-indigo-500/20"
-                >
-                  <Globe size={12} /> Publicar
+                <button onClick={() => setShowModalPublicar(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)", color: "#000" }}>
+                  <Globe size={11} /> Publicar
                 </button>
               </div>
             )}
@@ -521,37 +483,33 @@ export default function NexaOnePage() {
           <div className="flex-1 overflow-hidden">
             {!currentHtml ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-8">
-                <div className="w-20 h-20 rounded-3xl bg-gray-800/80 flex items-center justify-center mb-5 border border-gray-700/50">
-                  <Moon size={30} className="text-gray-700" />
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <Moon size={24} style={{ color: "#27272a" }} />
                 </div>
-                  <h2 className="text-lg font-semibold text-gray-400 mb-2">Tu escrito aparecerá aquí</h2>
-                <p className="text-gray-600 text-sm max-w-xs leading-relaxed">
-                  Describe lo que quieres crear en el chat y Nexa One Life lo generará en tiempo real.
+                <h2 className="text-base font-semibold mb-2" style={{ color: "#3f3f46" }}>Tu resultado aparecerá aquí</h2>
+                <p className="text-xs max-w-xs leading-relaxed" style={{ color: "#27272a" }}>
+                  Escribe en el chat y la IA construirá tu proyecto en tiempo real.
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2 justify-center">
-                  {["Dashboard", "Landing Page", "Juego", "Calculadora", "Portfolio"].map((tag) => (
-                    <span key={tag} className="px-3 py-1 rounded-full bg-gray-800/60 text-gray-600 text-xs border border-gray-700/40">{tag}</span>
-                  ))}
-                </div>
               </div>
             ) : activeTab === "preview" ? (
-              <div className="h-full overflow-auto p-6" style={{background:'#000000'}}>
+              <div className="h-full overflow-auto p-6" style={{ background: "#000" }}>
                 <div
-                  className="prose prose-invert max-w-none text-sm leading-relaxed"
-                  style={{color:'#d4d4d4',fontFamily:'Georgia, serif',lineHeight:'1.8'}}
+                  className="prose prose-invert max-w-none"
+                  style={{ color: "#d4d4d4", fontFamily: "Georgia, 'Times New Roman', serif", lineHeight: "1.9", fontSize: "15px" }}
                   dangerouslySetInnerHTML={{
                     __html: currentHtml
-                      .replace(/<style[\s\S]*?<\/style>/gi, '')
-                      .replace(/<script[\s\S]*?<\/script>/gi, '')
-                      .replace(/<html[^>]*>|<\/html>|<head[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, '')
-                      .replace(/background[^;:]*:[^;]*/gi, '')
-                      .replace(/color\s*:\s*[^;]*/gi, '')
+                      .replace(/<style[\s\S]*?<\/style>/gi, "")
+                      .replace(/<script[\s\S]*?<\/script>/gi, "")
+                      .replace(/<html[^>]*>|<\/html>|<head[\s\S]*?<\/head>|<body[^>]*>|<\/body>/gi, "")
+                      .replace(/background[^;:]*:[^;]*/gi, "")
+                      .replace(/color\s*:\s*[^;]*/gi, "")
                   }}
                 />
               </div>
             ) : (
-              <div className="h-full overflow-auto" style={{background:'#000000'}}>
-                <pre className="p-5 text-xs text-gray-300 font-mono leading-relaxed whitespace-pre-wrap break-words">
+              <div className="h-full overflow-auto" style={{ background: "#000" }}>
+                <pre className="p-5 text-xs font-mono leading-relaxed whitespace-pre-wrap break-words" style={{ color: "#52525b" }}>
                   <code>{currentHtml}</code>
                 </pre>
               </div>
@@ -563,13 +521,9 @@ export default function NexaOnePage() {
       {/* Modales */}
       {showModalCreditos && <ModalCreditos onClose={() => setShowModalCreditos(false)} />}
       {showModalGitHub && currentHtml && <ModalGitHub html={currentHtml} onClose={() => setShowModalGitHub(false)} />}
-      {showModalPublicar && currentHtml && <ModalPublicar html={currentHtml} titulo={messages.find(m => m.role === 'user')?.content?.slice(0, 40)} onClose={() => setShowModalPublicar(false)} />}
+      {showModalPublicar && currentHtml && <ModalPublicar html={currentHtml} titulo={messages.find(m => m.role === "user")?.content?.slice(0, 40)} onClose={() => setShowModalPublicar(false)} />}
       {showPlantillas && <Plantillas onSelectPlantilla={(prompt) => { setInput(prompt); setShowExamples(false); }} onClose={() => setShowPlantillas(false)} />}
 
-      {/* Click fuera cierra menú modelo */}
-      {showModelMenu && <div className="fixed inset-0 z-40" onClick={() => setShowModelMenu(false)} />}
-
-      {/* Banner de instalación PWA */}
       <PWAInstall />
     </div>
   );
