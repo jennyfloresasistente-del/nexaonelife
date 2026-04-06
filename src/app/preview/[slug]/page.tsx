@@ -2,7 +2,8 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useParams } from "next/navigation";
-import { ExternalLink, Download, Share2, Smartphone, Check, Copy, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Download, Share2, Smartphone, Check, Copy, Zap, ArrowLeft } from "lucide-react";
 
 const GRAD = "linear-gradient(135deg, #7c3aed, #06b6d4)";
 
@@ -13,6 +14,7 @@ function PreviewContent() {
   const [titulo, setTitulo] = useState<string>("");
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!slug) return;
@@ -32,13 +34,21 @@ function PreviewContent() {
   }, [slug]);
 
   const handleDownload = () => {
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${slug}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (!html) return;
+    try {
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${slug}.html`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 150);
+    } catch {
+      const win = window.open("", "_blank");
+      if (win) { win.document.write(html); win.document.close(); }
+    }
   };
 
   const handleCopyLink = () => {
@@ -98,8 +108,14 @@ function PreviewContent() {
       <header className="flex items-center justify-between px-4 py-2.5 shrink-0 z-10"
         style={{ background: "rgba(0,0,0,0.95)", borderBottom: "1px solid rgba(124,58,237,0.12)", backdropFilter: "blur(20px)" }}>
 
-        {/* Logo + título */}
+        {/* Botón regresar + Logo + título */}
         <div className="flex items-center gap-2.5">
+          <button onClick={() => router.back()}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold transition-all mr-1"
+            style={{ background: "rgba(255,255,255,0.04)", color: "#71717a", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <ArrowLeft size={13} />
+            <span className="hidden sm:inline">Regresar</span>
+          </button>
           <div className="flex items-center gap-1">
             <span className="text-sm font-black" style={{
               background: GRAD,

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Sparkles, CheckCircle, ArrowRight } from "lucide-react";
+import { Sparkles, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useUserStore, PLANES } from "@/lib/store";
 import { Suspense } from "react";
@@ -51,11 +51,20 @@ function PagoExitosoContent() {
 
         <button
           onClick={() => router.push("/")}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
+          className="w-full flex items-center justify-center gap-2 text-white font-bold py-4 px-6 rounded-2xl transition-all"
+          style={{ background: "linear-gradient(135deg, #7c3aed, #06b6d4)", boxShadow: "0 0 30px rgba(124,58,237,0.3)" }}
         >
           <Sparkles size={18} />
           Empezar a crear
           <ArrowRight size={18} />
+        </button>
+        <button
+          onClick={() => router.back()}
+          className="w-full flex items-center justify-center gap-2 mt-3 font-semibold py-3 px-6 rounded-2xl transition-all"
+          style={{ background: "rgba(255,255,255,0.05)", color: "#71717a", border: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <ArrowLeft size={16} />
+          Regresar
         </button>
       </div>
     </div>

@@ -26,8 +26,17 @@ export function ModalCreditos({ onClose }: Props) {
         body: JSON.stringify({ planId, userId: "user_" + Date.now() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error al procesar");
-      window.location.href = data.checkoutUrl;
+      if (!res.ok) {
+        // Mensaje amigable si el token no está configurado
+        if (data.error?.includes("MERCADOPAGO_ACCESS_TOKEN") || data.error?.includes("no configurado")) {
+          throw new Error("El sistema de pagos está en configuración. Por favor contacta al administrador.");
+        }
+        throw new Error(data.error || "Error al procesar el pago");
+      }
+      // Usar checkoutUrl (producción) o sandboxUrl (pruebas) según disponibilidad
+      const url = data.checkoutUrl || data.sandboxUrl;
+      if (!url) throw new Error("No se pudo obtener el enlace de pago");
+      window.location.href = url;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error desconocido");
       setLoading(null);
