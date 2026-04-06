@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     });
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://nexaoneia.com";
-    const url = `${baseUrl}/preview/${slug}`;
+    const url = `https://preview.nexaoneia.com/${slug}`;
 
     return NextResponse.json({ slug, url });
   } catch {

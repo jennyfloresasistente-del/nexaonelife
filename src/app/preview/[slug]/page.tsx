@@ -67,7 +67,7 @@ function PreviewContent() {
         <h1 className="text-2xl font-black text-white mb-2">App no encontrada</h1>
         <p className="mb-2" style={{ color: "#52525b" }}>Esta app no existe o aún no ha sido publicada.</p>
         <p className="text-xs mb-8" style={{ color: "#27272a" }}>
-          nexaoneia.com/preview/{slug}
+          preview.nexaoneia.com/{slug}
         </p>
         <a href="https://nexaoneia.com"
           className="px-6 py-3 font-bold rounded-xl transition-all text-black"
@@ -155,7 +155,7 @@ function PreviewContent() {
         </div>
         <div className="flex-1 rounded-md px-3 py-1 text-xs text-center"
           style={{ background: "#0a0a0a", color: "#27272a", border: "1px solid #111" }}>
-          nexaoneia.com/preview/{slug}
+          preview.nexaoneia.com/{slug}
         </div>
       </div>
 

@@ -788,7 +788,7 @@ export default function NexaOnePage() {
                         ))}
                       </div>
                       <div className="flex-1 rounded-md px-2 py-1 text-xs text-center" style={{ background: "#111", color: "#3f3f46" }}>
-                        nexaoneia.com/preview
+                        preview.nexaoneia.com
                       </div>
                     </div>
                   )}

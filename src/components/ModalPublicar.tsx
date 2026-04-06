@@ -91,7 +91,7 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
             <>
               <div className="rounded-2xl p-4" style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)'}}>
                 <p className="text-sm leading-relaxed" style={{color:'#a1a1aa'}}>
-                  Tu app se publicará en <span className="font-semibold" style={{color:'#ffd700'}}>nexaoneia.com/preview/[slug]</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
+                  Tu app se publicará en <span className="font-semibold" style={{color:'#ffd700'}}>preview.nexaoneia.com/[slug]</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
                 </p>
               </div>
 
