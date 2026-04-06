@@ -424,7 +424,7 @@ const CATEGORIAS = [
 
 const COSTO_LABEL: Record<number, { label: string; color: string; bg: string; border: string }> = {
   1: { label: "1 crédito",   color: "#22c55e", bg: "rgba(34,197,94,0.12)",  border: "rgba(34,197,94,0.25)" },
-  2: { label: "2 créditos",  color: "#ffd700", bg: "rgba(255,215,0,0.1)",   border: "rgba(255,215,0,0.25)" },
+  2: { label: "2 créditos",  color: "#06b6d4", bg: "rgba(6,182,212,0.1)",   border: "rgba(6,182,212,0.25)" },
   3: { label: "3 créditos",  color: "#f97316", bg: "rgba(249,115,22,0.1)",  border: "rgba(249,115,22,0.25)" },
 };
 
@@ -455,8 +455,8 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
         style={{ borderColor: "#111", background: "rgba(0,0,0,0.98)" }}>
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: "rgba(255,215,0,0.08)", border: "1px solid rgba(255,215,0,0.15)" }}>
-            <Layers size={14} style={{ color: "#ffd700" }} />
+            style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)" }}>
+            <Layers size={14} style={{ color: "#a78bfa" }} />
           </div>
           <div>
             <h2 className="font-black text-white text-sm">Plantillas</h2>
@@ -485,7 +485,7 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
             style={{
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.07)",
-              caretColor: "#ffd700",
+              caretColor: "#7c3aed",
             }}
           />
         </div>
@@ -499,9 +499,9 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
               className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: categoriaActiva === cat
-                  ? "linear-gradient(135deg,#b8860b,#ffd700)"
+                  ? "linear-gradient(135deg,#7c3aed,#06b6d4)"
                   : "rgba(255,255,255,0.03)",
-                color: categoriaActiva === cat ? "#000" : "#3f3f46",
+                color: categoriaActiva === cat ? "#fff" : "#3f3f46",
                 border: categoriaActiva === cat ? "none" : "1px solid rgba(255,255,255,0.05)",
               }}>
               {cat}
@@ -540,7 +540,7 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
                   }}
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.border = "1px solid rgba(255,215,0,0.2)";
+                    el.style.border = "1px solid rgba(124,58,237,0.3)";
                     el.style.background = "rgba(255,255,255,0.04)";
                     el.style.transform = "translateY(-2px)";
                   }}
@@ -593,7 +593,7 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
                     <div className="flex items-start justify-between gap-1 mb-1">
                       <h3 className="font-bold text-white text-xs leading-tight">{plantilla.nombre}</h3>
                       <ChevronRight size={11} className="shrink-0 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ color: "#ffd700" }} />
+                        style={{ color: "#a78bfa" }} />
                     </div>
                     <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "#3f3f46" }}>
                       {plantilla.descripcion}
@@ -601,8 +601,8 @@ export function Plantillas({ onSelectPlantilla, onClose }: Props) {
 
                     {/* CTA hover */}
                     <div className="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                      <Sparkles size={9} style={{ color: "#ffd700" }} />
-                      <span className="text-xs font-bold" style={{ color: "#b8860b" }}>
+                      <Sparkles size={9} style={{ color: "#a78bfa" }} />
+                      <span className="text-xs font-bold" style={{ color: "#7c3aed" }}>
                         Usar plantilla →
                       </span>
                     </div>

@@ -7,7 +7,6 @@
   --foreground: #f9fafb;
   --accent: #7c3aed;
   --accent2: #06b6d4;
-  --gold: #f59e0b;
 }
 
 * { box-sizing: border-box; }
@@ -85,7 +84,7 @@ html, body {
 
 /* ── Texto gradiente ── */
 .text-gradient {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4, #f59e0b);
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

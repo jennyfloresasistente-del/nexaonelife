@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { ExternalLink, Download, Share2, Smartphone, Check, Copy, Zap } from "lucide-react";
 
+const GRAD = "linear-gradient(135deg, #7c3aed, #06b6d4)";
+
 function PreviewContent() {
   const params = useParams();
   const slug = params.slug as string;
@@ -61,8 +63,8 @@ function PreviewContent() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center" style={{ background: "#000" }}>
         <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-6"
-          style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)" }}>
-          <Zap size={28} className="text-black" />
+          style={{ background: GRAD, boxShadow: "0 0 40px rgba(124,58,237,0.3)" }}>
+          <Zap size={28} className="text-white" />
         </div>
         <h1 className="text-2xl font-black text-white mb-2">App no encontrada</h1>
         <p className="mb-2" style={{ color: "#52525b" }}>Esta app no existe o aún no ha sido publicada.</p>
@@ -70,8 +72,8 @@ function PreviewContent() {
           preview.nexaoneia.com/{slug}
         </p>
         <a href="https://nexaoneia.com"
-          className="px-6 py-3 font-bold rounded-xl transition-all text-black"
-          style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)" }}>
+          className="px-6 py-3 font-bold rounded-xl transition-all text-white"
+          style={{ background: GRAD, boxShadow: "0 0 20px rgba(124,58,237,0.3)" }}>
           Crear mi propia app
         </a>
       </div>
@@ -83,7 +85,7 @@ function PreviewContent() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#000" }}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
-            style={{ borderColor: "#ffd700", borderTopColor: "transparent" }} />
+            style={{ borderColor: "#7c3aed", borderTopColor: "transparent" }} />
           <p className="text-xs" style={{ color: "#27272a" }}>Cargando app...</p>
         </div>
       </div>
@@ -94,30 +96,22 @@ function PreviewContent() {
     <div className="min-h-screen flex flex-col" style={{ background: "#000" }}>
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-2.5 shrink-0 z-10"
-        style={{ background: "rgba(0,0,0,0.95)", borderBottom: "1px solid #111", backdropFilter: "blur(20px)" }}>
+        style={{ background: "rgba(0,0,0,0.95)", borderBottom: "1px solid rgba(124,58,237,0.12)", backdropFilter: "blur(20px)" }}>
 
         {/* Logo + título */}
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <span className="text-sm font-black" style={{
-              background: "linear-gradient(135deg,#a0a0a0,#e8e8e8,#a8a8a8)",
+              background: GRAD,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}>Nexa</span>
-            <span className="text-sm font-black" style={{
-              background: "linear-gradient(135deg,#b8860b,#ffd700,#daa520)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>One</span>
-            <span className="text-sm font-black" style={{
-              background: "linear-gradient(135deg,#8b4513,#cd853f,#8b4513)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>Life</span>
+            <span className="text-sm font-black text-white">One</span>
+            <span className="text-sm font-black" style={{ color: "#a78bfa" }}>Life</span>
           </div>
           {titulo && (
             <>
-              <span style={{ color: "#1f1f1f" }}>·</span>
+              <span style={{ color: "#27272a" }}>·</span>
               <span className="text-sm font-semibold text-white truncate max-w-[160px]">{titulo}</span>
             </>
           )}
@@ -127,19 +121,19 @@ function PreviewContent() {
         <div className="flex items-center gap-1.5">
           <button onClick={handleCopyLink}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-            style={{ background: "rgba(255,255,255,0.04)", color: "#71717a", border: "1px solid #111" }}>
+            style={{ background: "rgba(255,255,255,0.04)", color: "#71717a", border: "1px solid rgba(255,255,255,0.07)" }}>
             {copied ? <Check size={12} style={{ color: "#22c55e" }} /> : <Copy size={12} />}
             {copied ? "¡Copiado!" : "Copiar link"}
           </button>
           <button onClick={handleShare}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-            style={{ background: "rgba(255,255,255,0.04)", color: "#71717a", border: "1px solid #111" }}>
+            style={{ background: "rgba(255,255,255,0.04)", color: "#71717a", border: "1px solid rgba(255,255,255,0.07)" }}>
             <Share2 size={12} />
             Compartir
           </button>
           <button onClick={handleDownload}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-black"
-            style={{ background: "linear-gradient(135deg,#b8860b,#ffd700)" }}>
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-white"
+            style={{ background: GRAD, boxShadow: "0 0 15px rgba(124,58,237,0.3)" }}>
             <Download size={12} /> Descargar
           </button>
         </div>
@@ -173,10 +167,10 @@ function PreviewContent() {
       {/* FAB — Crear la mía */}
       <div className="fixed bottom-5 right-5 z-20">
         <a href="https://nexaoneia.com"
-          className="flex items-center gap-2 px-4 py-2.5 text-black text-xs font-black rounded-2xl shadow-2xl transition-all hover:scale-105"
+          className="flex items-center gap-2 px-4 py-2.5 text-white text-xs font-black rounded-2xl shadow-2xl transition-all hover:scale-105"
           style={{
-            background: "linear-gradient(135deg,#b8860b,#ffd700)",
-            boxShadow: "0 8px 32px rgba(255,215,0,0.25)",
+            background: GRAD,
+            boxShadow: "0 8px 32px rgba(124,58,237,0.35)",
           }}>
           <Smartphone size={14} />
           Crea tu app gratis
@@ -191,7 +185,7 @@ export default function PreviewPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#000" }}>
         <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
-          style={{ borderColor: "#ffd700", borderTopColor: "transparent" }} />
+          style={{ borderColor: "#7c3aed", borderTopColor: "transparent" }} />
       </div>
     }>
       <PreviewContent />

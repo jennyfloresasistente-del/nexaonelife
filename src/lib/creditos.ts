@@ -86,7 +86,7 @@ export function calcularCosto(prompt: string, esEdicion: boolean = false): Costo
 
 export const NIVEL_COLORS: Record<CostoGeneracion["nivel"], { color: string; bg: string; border: string }> = {
   "simple":       { color: "#22c55e", bg: "rgba(34,197,94,0.1)",   border: "rgba(34,197,94,0.25)" },
-  "medio":        { color: "#ffd700", bg: "rgba(255,215,0,0.1)",   border: "rgba(255,215,0,0.25)" },
+  "medio":        { color: "#06b6d4", bg: "rgba(6,182,212,0.1)",   border: "rgba(6,182,212,0.25)" },
   "complejo":     { color: "#f97316", bg: "rgba(249,115,22,0.1)",  border: "rgba(249,115,22,0.25)" },
   "muy-complejo": { color: "#ef4444", bg: "rgba(239,68,68,0.1)",   border: "rgba(239,68,68,0.25)" },
 };

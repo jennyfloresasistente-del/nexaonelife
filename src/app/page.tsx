@@ -32,8 +32,8 @@ const C = {
   purpleBorder: "rgba(124,58,237,0.25)",
   cyan: "#06b6d4",
   cyanDim: "rgba(6,182,212,0.12)",
-  amber: "#f59e0b",
-  amberDim: "rgba(245,158,11,0.12)",
+  amber: "#06b6d4",
+  amberDim: "rgba(6,182,212,0.12)",
   green: "#22c55e",
   red: "#ef4444",
   bg: "#000000",
@@ -46,7 +46,7 @@ const C = {
 
 const GRAD_PRIMARY = "linear-gradient(135deg, #7c3aed, #06b6d4)";
 const GRAD_ACCENT  = "linear-gradient(135deg, #7c3aed, #a78bfa)";
-const GRAD_AMBER   = "linear-gradient(135deg, #f59e0b, #fbbf24)";
+const GRAD_AMBER   = "linear-gradient(135deg, #7c3aed, #06b6d4)";
 
 const EXAMPLE_PROMPTS = [
   "Crea un menú digital para restaurante con categorías y WhatsApp",
@@ -216,6 +216,7 @@ export default function NexaOnePage() {
     const costo = calcularCosto(prompt, !!proyectoActualId);
     if (creditos < costo.creditos) { setNoCreditos(true); return; }
 
+    // Consumir todos los créditos de una sola vez
     for (let i = 0; i < costo.creditos; i++) consumirCredito();
     setInput("");
     setShowExamples(false);
@@ -866,7 +867,7 @@ export default function NexaOnePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}
           onClick={() => setShowLoginModal(false)}>
-          <div className="w-full max-w-sm rounded-2xl p-6"
+          <div className="relative w-full max-w-sm rounded-2xl p-6"
             style={{ background: "#0a0a0f", border: "1px solid rgba(124,58,237,0.3)", boxShadow: "0 0 60px rgba(124,58,237,0.15)" }}
             onClick={(e) => e.stopPropagation()}>
             <div className="text-center mb-6">
