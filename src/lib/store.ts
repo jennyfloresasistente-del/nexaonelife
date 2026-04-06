@@ -172,6 +172,17 @@ export const useUserStore = create<UserStore>()(
         }));
       },
     }),
-    { name: "nexaonelife-user" }
+    {
+      name: "nexaonelife-user-v2",
+      version: 2,
+      migrate: (persistedState: unknown, version: number) => {
+        const state = (persistedState ?? {}) as Record<string, unknown>;
+        // Si viene de versión anterior o tiene 0 créditos, dar 5 créditos de bienvenida
+        if (version < 2 || !state.creditos || (state.creditos as number) === 0) {
+          return { ...state, creditos: 5 };
+        }
+        return state;
+      },
+    }
   )
 );
