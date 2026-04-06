@@ -69,19 +69,19 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-3xl border border-gray-700 w-full max-w-md shadow-2xl">
+      <div className="rounded-3xl w-full max-w-md shadow-2xl" style={{background:'#0a0a0a',border:'1px solid #1a1a1a'}}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-800">
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b" style={{borderColor:'#1a1a1a'}}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{background:'linear-gradient(135deg,#b8860b,#ffd700)'}}>
               <Globe size={16} className="text-white" />
             </div>
             <div>
               <h2 className="font-black text-white text-sm">Publicar App</h2>
-              <p className="text-xs text-gray-500">Obtén un link para compartir</p>
+              <p className="text-xs" style={{color:'#52525b'}}>Obtén un link para compartir</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors">
+          <button onClick={onClose} className="p-1.5 transition-colors" style={{color:'#52525b'}}>
             <X size={18} />
           </button>
         </div>
@@ -89,9 +89,9 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
         <div className="p-6 space-y-4">
           {!url ? (
             <>
-              <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-                <p className="text-sm text-gray-300 leading-relaxed">
-                  Tu app se publicará en <span className="text-indigo-400 font-semibold">nexaoneia.com/preview/[slug]</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
+              <div className="rounded-2xl p-4" style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)'}}>
+                <p className="text-sm leading-relaxed" style={{color:'#a1a1aa'}}>
+                  Tu app se publicará en <span className="font-semibold" style={{color:'#ffd700'}}>nexaoneia.com/preview/[slug]</span> y cualquier persona podrá verla y usarla desde su celular o computadora.
                 </p>
               </div>
 
@@ -104,7 +104,8 @@ export function ModalPublicar({ html, titulo, onClose }: Props) {
               <button
                 onClick={handlePublicar}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
+                className="w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl transition-all disabled:opacity-60"
+                style={{background:'linear-gradient(135deg,#b8860b,#ffd700)',color:'#000'}}
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Globe size={16} />}
                 {loading ? "Publicando..." : "Publicar ahora"}
