@@ -320,11 +320,24 @@ export default function NexaOnePage() {
 
   const handleDownload = () => {
     if (!currentHtml) return;
-    const blob = new Blob([currentHtml], { type: "text/html" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href = url; a.download = `${proyectoActual?.nombre ?? "nexaonelife"}.html`; a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = new Blob([currentHtml], { type: "text/html;charset=utf-8" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href = url;
+      a.download = `${proyectoActual?.nombre ?? "nexaonelife"}.html`;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 150);
+    } catch {
+      // Fallback: abrir en nueva pestaña para que el usuario guarde manualmente
+      const win = window.open("", "_blank");
+      if (win) { win.document.write(currentHtml); win.document.close(); }
+    }
   };
 
   const handleClear = () => {

@@ -1,5 +1,6 @@
-// NexaOne Life Service Worker v3 — NO cachea páginas HTML
-const CACHE_NAME = "nexaonelife-v3";
+// NexaOne Life Service Worker v4 — NO cachea páginas HTML
+// Actualizado: fuerza actualización automática en todos los clientes
+const CACHE_NAME = "nexaonelife-v4";
 const STATIC_ASSETS = ["/manifest.json", "/logo.png", "/logo-sm.png"];
 
 self.addEventListener("install", (event) => {
@@ -15,7 +16,14 @@ self.addEventListener("activate", (event) => {
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
-  self.clients.claim();
+  self.clients.claim().then(() => {
+    // Notificar a todos los clientes que recarguen para ver los cambios
+    return self.clients.matchAll({ type: "window" }).then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({ type: "SW_UPDATED", version: "v4" });
+      });
+    });
+  });
 });
 
 self.addEventListener("fetch", (event) => {
