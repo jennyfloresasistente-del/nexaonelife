@@ -1,0 +1,36 @@
+{
+  "name": "Nexa One Life",
+  "short_name": "Nexa One",
+  "description": "Crea apps con inteligencia artificial en segundos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-sm.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "developer tools", "utilities"],
+  "lang": "es-MX",
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Nueva app",
+      "short_name": "Crear",
+      "description": "Crea una nueva app con IA",
+      "url": "/",
+      "icons": [{ "src": "/logo-sm.png", "sizes": "192x192" }]
+    }
+  ]
+}
