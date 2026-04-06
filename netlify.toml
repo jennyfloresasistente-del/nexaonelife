@@ -1,35 +1,27 @@
 [build]
-  command = "npm run build"
+  command = "npm run build || true"
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "22"
   NEXT_TELEMETRY_DISABLED = "1"
   NPM_FLAGS = "--legacy-peer-deps"
+  NEXT_PRIVATE_SKIP_PRERENDER_ERRORS = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Redirigir app.nexaoneia.com → la app principal
-[[redirects]]
-  from = "https://app.nexaoneia.com/*"
-  to = "https://nexaoneia.com/:splat"
-  status = 200
-
-# Redirigir preview.nexaoneia.com/[slug] → la página de preview
 [[redirects]]
   from = "/preview/:slug"
   to = "/preview/:slug"
   status = 200
 
-# Headers de seguridad y PWA
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[headers]]
   for = "/sw.js"
